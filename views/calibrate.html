@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      overflow: visible;
+      font-family: 'Arial', sans-serif;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 50px;
+    }
+    .dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      position: absolute;
+      background-color: red;
+      cursor: pointer;
+      border: 2px solid black;
+      transition: background-color 0.3s;
+    }
+    .dot:hover {
+      background-color: #ff6666;
+    }
+    #centre-dot {
+      background-color: red;
+      border: 2px solid black;
+      transition: background-color 0.3s;
+    }
+    #centre-dot:hover {
+      background-color: #ff6666;
+    }
+    #instructions {
+      text-align: center;
+      margin-bottom: 200px;
+      font-size: 20px;
+    }
+  </style>
+  <title>Studie - Kalibrierung</title>
+</head>
+<body>
+  <div id="content-container">
+    <h1>Kalibrierung</h1>
+    <p id="instructions">
+      Nachdem Sie Ihre Kamera aktiviert haben, warten Sie bitte bis das Feld über Ihrem Gesicht grün wird.
+      </br>
+      Klicken Sie dann auf jeden der Punkte, bis alle grün werden.
+    </p> 
+  </div>
+  <script>
+    // Calibration / experiment load script
+    document.addEventListener('DOMContentLoaded', function() {
+    let contentContainer = document.getElementById('content-container')
+    let clickedDots = 0
+
+    // Create and position the centre dot
+    const centerDot = document.createElement('div')
+    centerDot.id = 'center-dot'
+    centerDot.className = 'dot'
+    centerDot.style.left = '50%'
+    centerDot.style.top = '50%'
+    contentContainer.appendChild(centerDot)
+
+    // Create and position the outer dots around the corners
+	// Remove the top left dot (20%, 20%) because buggy on small resolutions due to camera
+    const dots = [
+      { left: '67.5%', top: '32.5%' },
+      { left: '32.5%', top: '32.5%' },
+      { left: '32.5%', top: '67.5%' },
+      { left: '67.5%', top: '67.5%' },
+      { left: '85%', top: '20%' },
+      { left: '85%', top: '85%' },
+      { left: '20%', top: '85%' },
+      { left: '20%', top: '50%' },
+      { left: '50%', top: '20%' },
+      { left: '85%', top: '50%' },
+      { left: '50%', top: '85%' },
+      { left: '50%', top: '50%' },
+    ]
+    const numberOfDots = dots.length
+
+    dots.forEach((position, index) => {
+      const dot = document.createElement('div')
+      dot.className = 'dot'
+      dot.style.left = position.left
+      dot.style.top = position.top
+      contentContainer.appendChild(dot)
+
+      dot.addEventListener('click', function() {
+        // Check if the dot is not green before changing its color
+        if (dot.style.backgroundColor !== 'green') {
+          changeColour(dot)
+        }
+      })
+    })
+
+    // Function to change the colour of a dot
+    function changeColour(dot) {
+      const colours = ['red', 'orange', 'yellow', 'green']
+      const currentColour = dot.style.backgroundColor || 'red' // Handle the case where backgroundColor is not set
+      const nextColour = colours[(colours.indexOf(currentColour) + 1) % colours.length]
+
+      dot.style.backgroundColor = nextColour
+
+      if (nextColour === 'green') {
+        clickedDots++
+
+        // Top left dot is blocked by camera - todo: fix
+        if (clickedDots === (numberOfDots)) {
+          // Start experiment
+          alert('Die Kalibrierung ist abgeschlossen. Bitte klicken Sie auf OK, um mit dem ersten Teil des Experiments beginnen.')
+          const contentContainer = document.getElementById('content-container')
+          fetch('/experiment/1/raw')
+            .then(response => {
+              return response.text()
+            })
+            .then(content => {
+              contentContainer.innerHTML = content
+              // Reset the gazeData array
+              gazeData = []
+              webgazer.showPredictionPoints(false)
+              webgazer.showVideo(false)
+              webgazer.showFaceOverlay(false)
+              webgazer.showFaceFeedbackBox(false)
+              // Check for experiment finish
+              document.getElementById('finish-experiment-button').addEventListener('click', function() {
+                fetch('/experiment/width_height', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({width: window.screen.width, height: window.screen.height})
+                })
+
+                fetch('/experiment/1/raw', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(gazeData)
+                })
+                .then(data => {
+                  window.location.href = '/experiment/1/break'
+                })
+              })
+            })
+        }
+      }
+    }
+  })
+  </script>
+  <script src="../public/webgazer.js" type="text/javascript"></script>
+  <script>
+    // Webgazer data process
+    let gazeData = []
+    // Flush regression model (causes lag otherwise)
+    webgazer.clearData()
+    // Configure main listener and save data to gazeData array
+    webgazer.setGazeListener(function(data, elapsedTime) {
+      if (data == null) {
+        return
+      }
+      let scrollOffset = window.scrollY
+      let xprediction = data.x
+      let yprediction = data.y + scrollOffset
+      gazeData.push({x: xprediction | 0, y: yprediction | 0, count: 1})
+    }).begin()
+  </script>
+</body>
+</html>

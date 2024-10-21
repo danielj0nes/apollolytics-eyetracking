@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Studie - Hauptmenü</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            margin: 0;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+        }
+        h1, h2 {
+            color: #ffffff;
+        }
+        h2 span {
+            color: #7e57c2;
+        }
+
+        main {
+            margin-top: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ffffff;
+            background-color: #333;
+            color: #ffffff;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            background-color: #333;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Nachrichten in der digitalen Welt</h1>
+    <h2>Bitte geben Sie Ihre <span>Teilnehmer-ID</span> ein</h2>
+    <main>
+        <form action="/register" method="post">
+            <br />
+            <input type="text" name="participantname" placeholder="Teilnehmer-ID" id="participantname" required>
+            <button type="submit">Submit</button>
+        </form>
+    </main>
+</body>
+
+</html>

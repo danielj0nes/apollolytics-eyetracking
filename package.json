@@ -1,0 +1,26 @@
+{
+  "name": "apollolytics",
+  "version": "1.0.0",
+  "description": "apollolytics",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Daniel Gordon Jones",
+  "license": "ISC",
+  "dependencies": {
+    "handlebars": "^4.7.8",
+    "koa": "^2.14.2",
+    "koa-bodyparser": "^4.4.1",
+    "koa-router": "^12.0.1",
+    "koa-session": "^6.4.0",
+    "koa-sslify": "^5.0.1",
+    "koa-static": "^5.0.0",
+    "koa-views": "^8.1.0",
+    "sqlite": "^5.1.1",
+    "sqlite-async": "^1.2.0",
+    "webgazer": "^3.3.0"
+  }
+}
