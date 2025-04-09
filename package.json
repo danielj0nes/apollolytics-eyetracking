@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "handlebars": "^4.7.8",
-    "koa": "^2.14.2",
+    "koa": "^2.16.1",
     "koa-bodyparser": "^4.4.1",
     "koa-router": "^12.0.1",
     "koa-session": "^6.4.0",
